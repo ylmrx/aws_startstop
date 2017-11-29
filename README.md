@@ -30,5 +30,8 @@ Commands:
 ## Dependancies
 
 You will need: 
- - click
- - boto3
+ - `python2` (obviously)
+ - `click`
+ - `boto3`
+
+Install these with : `pip install [whatever]`
