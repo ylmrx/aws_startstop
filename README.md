@@ -9,7 +9,7 @@ This tool stops instances based on a pattern.
 
 It's intended to be run from cronjobs. 
 
-It can, and will, shutdown unexpected instances if mis-used. Be careful.
+**It can, and will, shutdown unexpected instances if mis-used. Be careful.**
 
 ## Usage
 
