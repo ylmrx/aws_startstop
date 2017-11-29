@@ -24,27 +24,43 @@ def main(ctx, region, profile):
     ctx.obj['PROFILE'] = profile
 
 @main.command()
-def start():
-    click.echo('start the boxes')
+@click.argument('pattern', nargs=1, type=click.STRING)
+@click.pass_context
+def start(ctx, pattern):
+    sess = boto3.session.Session(profile_name=ctx.obj['PROFILE'], region_name=ctx.obj['REGION'])
+    ec2 = sess.resource('ec2')
+    for i in ec2.instances.all():
+        tags = dict(map(lambda t: (t['Key'], t['Value']), i.tags))
+        if pattern in tags['Name'] and i.state['Code'] == 80:
+            i.start()
+            if i.wait_until_running() is None:
+                click.secho('Startup OK: ' + i.id, fg='green')
+            else:
+                click.secho('Startup too long or failing: ' + i.id, fg='red')
 
 @main.command()
 def stop():
     click.echo('stop the boxes')
 
 @main.command()
-@click.argument('pattern', nargs=1)
-def status(ctx):
-    print ctx.obj['REGION']
-    print pattern
+@click.argument('pattern', nargs=1, type=click.STRING, default='')
+@click.pass_context
+def status(ctx, pattern):
     sess = boto3.session.Session(profile_name=ctx.obj['PROFILE'], region_name=ctx.obj['REGION'])
-    ec2 = sess.resource(ec2)
-
-    click.echo('status')
-
+    ec2 = sess.resource('ec2')
+    for i in ec2.instances.all():
+        tags = dict(map(lambda t: (t['Key'], t['Value']), i.tags))
+        if pattern in tags['Name']:
+            if i.state['Code'] == 16:
+                click.secho('Running - ' + tags['Name'], fg='green')
+            elif i.state['Code'] == 80:
+                click.secho('Stopped - ' + tags['Name'], fg='red')
+            else:
+                click.secho('Unexpected - ' + tags['Name'], fg='yellow')
 
 main.add_command(start)
 main.add_command(stop)
 main.add_command(status)
 
 if __name__ == '__main__':
-    main(obj = {} )
+    main( obj = {} )
