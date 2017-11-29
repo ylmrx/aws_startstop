@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys
 import boto3
 import click
@@ -36,11 +37,22 @@ def start(ctx, pattern):
             if i.wait_until_running() is None:
                 click.secho('Startup OK: ' + i.id, fg='green')
             else:
-                click.secho('Startup too long or failing: ' + i.id, fg='red')
+                click.secho('Startup too long or is failing: ' + i.id, fg='red')
 
 @main.command()
-def stop():
-    click.echo('stop the boxes')
+@click.argument('pattern', nargs=1, type=click.STRING)
+@click.pass_context
+def stop(ctx, pattern):
+    sess = boto3.session.Session(profile_name=ctx.obj['PROFILE'], region_name=ctx.obj['REGION'])
+    ec2 = sess.resource('ec2')
+    for i in ec2.instances.all():
+        tags = dict(map(lambda t: (t['Key'], t['Value']), i.tags))
+        if pattern in tags['Name'] and i.state['Code'] == 16:
+            i.stop()
+            if i.wait_until_stopped() is None:
+                click.secho('Stop OK: ' + i.id, fg='green')
+            else:
+                click.secho('Stop too long or failing: ' + i.id, fg='red')
 
 @main.command()
 @click.argument('pattern', nargs=1, type=click.STRING, default='')
