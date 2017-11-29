@@ -26,3 +26,9 @@ Commands:
   status
   stop
 ```
+
+## Dependancies
+
+You will need: 
+ - click
+ - boto3
