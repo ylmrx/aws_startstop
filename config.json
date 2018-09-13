@@ -1,0 +1,8 @@
+{
+  "inhibit": [
+    "-prod-"
+  ],
+  "force_desinhibit": [
+    "iph-btshop-preprod-"
+  ]
+}

@@ -17,9 +17,10 @@ It's intended to be run from cronjobs.
 Usage: stasto.py [OPTIONS] COMMAND [ARGS]...
 
 Options:
-  --region TEXT   AWS region to work with
-  --profile TEXT  AWS profile to work with
-  --help          Show this message and exit.
+  -c, --conf FILENAME  Path to the JSON config
+  --region TEXT        AWS region to work with
+  --profile TEXT       AWS profile to work with
+  --help               Show this message and exit.
 
 Commands:
   start
